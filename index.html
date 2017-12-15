@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'/>
+    <title>The Stargazers Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet'/>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-110467995-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-110467995-1', { 'anonymize_ip': true });
+    </script>
+
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaG9va3V1IiwiYSI6ImNqYWZtc3B1bjE2ZWYzM3F1MmdqdHcxb3cifQ.Ru_O7FWsJG0xN8tpn_YiDQ';
+
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v9',
+        zoom: 1,
+        center: [0, 0]
+    });
+
+    var data = {
+        'features': []
+    };
+
+    var Resolver = (function () {
+        var _page = 1;
+        var _user;
+        var _repo;
+
+        var resolveUser = function () {
+            var user = JSON.parse(this.responseText);
+            if (user.lat && user.lng) {
+                data.features.push({
+                    'type': 'Feature',
+                    'geometry': {
+                        'coordinates': [user.lng, user.lat],
+                    },
+                    'properties': {
+                        'location': user.location,
+                        'username': user.username
+                    }
+                });
+                map.getSource('users').setData(data);
+            }
+        };
+
+        var fetchStargazer = function (user) {
+            var url = 'https://stargazersmap.com/v1/user/' + user;
+            var request = new XMLHttpRequest();
+            request.open('get', url);
+            request.onload = resolveUser;
+            request.send()
+        };
+
+        var resolveStargazers = function () {
+            var response = JSON.parse(this.responseText);
+            response.stargazers.forEach(function (stargazer) {
+                fetchStargazer(stargazer)
+            });
+        };
+        var fetchStargazers = function () {
+            var url = 'https://stargazersmap.com/v1/repo/' + _user + '/' + _repo;
+            var request = new XMLHttpRequest();
+            request.open('get', url);
+            request.onload = resolveStargazers;
+            request.send()
+        };
+
+        return {
+
+            visualize: function (user, repo) {
+                _repo = repo;
+                _user = user;
+                _page = 1;
+
+                data.features = [];
+                map.getSource('users').setData(data);
+
+                fetchStargazers()
+            },
+
+            parseHash: function () {
+                var parts = window.location.hash.substr(1).split('/');
+
+                var user = parts[0];
+                var repo = parts[1];
+
+                if (user && repo) {
+                    this.visualize(user, repo);
+                } else {
+                    alert('Please provide "user/repo" in the location hash')
+                }
+            }
+        };
+
+    })();
+
+
+    map.on('load', function () {
+
+        map.addSource('users', {
+            type: 'geojson',
+            data: data,
+            cluster: true,
+            clusterMaxZoom: 7,
+            clusterRadius: 40 // Radius of each cluster when clustering points (defaults to 50)
+        });
+
+        map.addLayer({
+            id: "clusters",
+            type: "circle",
+            source: "users",
+            filter: ["has", "point_count"],
+            paint: {
+                "circle-color": {
+                    property: "point_count",
+                    type: "interval",
+                    stops: [
+                        [0, "#449d44"],
+                        [10, "#f0ad4e"],
+                        [25, "#c9302c"]
+                    ]
+                },
+                "circle-radius": {
+                    property: "point_count",
+                    type: "interval",
+                    stops: [
+                        [0, 15],
+                        [10, 20],
+                        [25, 25]
+                    ]
+                }
+            }
+        });
+
+        map.addLayer({
+            id: "cluster-count",
+            type: "symbol",
+            source: "users",
+            filter: ["has", "point_count"],
+            layout: {
+                "text-field": "{point_count_abbreviated}",
+                "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+                "text-size": 12
+            }
+        });
+
+        map.addLayer({
+            id: "clusters-label",
+            type: "symbol",
+            source: "users",
+            layout: {
+                "text-field": "{location}",
+                "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+                "text-size": 10,
+                "text-offset": [0, 2]
+            }
+        });
+
+        map.addLayer({
+            id: "unclustered-point",
+            type: "circle",
+            source: "users",
+            filter: ["!has", "point_count"],
+            paint: {
+                "circle-color": "#0275d8",
+                "circle-radius": 8,
+                "circle-stroke-width": 1,
+                "circle-stroke-color": "#ffffff"
+            }
+        });
+
+        Resolver.parseHash();
+        window.addEventListener("hashchange", function () {Resolver.parseHash();});
+    });
+
+
+
+</script>
+
+</body>
+</html>
