@@ -1,0 +1,34 @@
+{
+  "env": {
+    "browser": true,
+    "worker": true,
+    "es6": true
+  },
+  "parser": "babel-eslint",
+  "ecmaFeatures": {
+    "arrowFunctions": true,
+    "blockBindings": true,
+    "classes": true,
+    "defaultParameters": true,
+    "destructuring": true,
+    "forOf": true,
+    "generators": true,
+    "modules": true,
+    "objectLiteralComputedProperties": true,
+    "objectLiteralDuplicateProperties": true,
+    "objectLiteralShorthandMethods": true,
+    "objectLiteralShorthandProperties": true,
+    "regexUFlag": true,
+    "regexYFlag": true,
+    "restParams": true,
+    "spread": true,
+    "superInFunctions": true,
+    "templateStrings": true,
+    "unicodeCodePointEscapes": true,
+    "globalReturn": true
+  },
+  "extends": ["standard"],
+  "rules": {
+    "comma-dangle": ["warn", "always-multiline"]
+  }
+}
