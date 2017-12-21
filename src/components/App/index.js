@@ -2,7 +2,7 @@ import React from 'react'
 
 import Resolver from '../../lib/Resolver'
 import { makeUserFeature } from '../../utils/map'
-import { parseRepoPath } from '../../utils/github'
+import { buildRepoPath, parseRepoPath } from '../../utils/github'
 import * as Errors from '../../constants/errors'
 import { trackVisualization } from '../../utils/tracking'
 import ErrorOutput from '../ErrorOutput'
@@ -92,6 +92,13 @@ class App extends React.Component {
       owner,
       repository,
     })
+
+    const repoPath = buildRepoPath({ owner, repository })
+
+    if (window.location.hash.indexOf(repoPath) < 0) {
+      console.log('setting hash again')
+      window.location.hash = repoPath
+    }
 
     Resolver.fetchStargazers({ owner, repository })
       .then(this.handleFetchStargazers)
