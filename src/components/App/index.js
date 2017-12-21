@@ -1,11 +1,11 @@
 import React from 'react'
-import classnames from 'classnames'
 
 import Resolver from '../../lib/Resolver'
 import { makeUserFeature } from '../../utils/map'
 import { buildRepoPath, parseRepoPath } from '../../utils/github'
 import * as Errors from '../../constants/errors'
 import { trackVisualization } from '../../utils/tracking'
+import Credits from '../Credits'
 import ErrorOutput from '../ErrorOutput'
 import Map from '../Map'
 import Search from '../Search'
@@ -166,19 +166,6 @@ class App extends React.Component {
     return (
       <div className='app'>
         <UserControls minimized={!showIntro}>
-          <div className={classnames('title', {
-            ['title--minimized']: !showIntro,
-          })}>
-            {showIntro
-              ? '✨ The Stargazer’s Map ✨'
-              : '✨ The Stargazer’s Map'
-            }
-          </div>
-          <div className={classnames('intro', {
-            ['intro--minimized']: !showIntro,
-          })}>
-            Enter a GitHub repo path to see its stargazers.
-          </div>
           <Search
             isFetching={isFetching}
             onError={this.handleError}
@@ -196,9 +183,7 @@ class App extends React.Component {
           data={data}
           onMapReady={this.handleMapReady}
         />
-        <div className='credits'>
-          by <a href='#'>@fabfuel</a> and <a href='#'>@mcombuechen</a>
-        </div>
+        <Credits/>
       </div>
     )
   }
