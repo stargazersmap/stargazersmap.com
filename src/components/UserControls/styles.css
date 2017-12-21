@@ -10,11 +10,16 @@
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.48);
   background-color: rgba(0, 0, 0, 0.48);
   transition: ease-out 625ms;
-  transition-property: top, left, transform;
+  transition-property:
+    top,
+    left,
+    transform;
 }
 
 .user-controls--minimized {
   top: 16px;
   left: 16px;
   transform: translate3d(0, 0, 0);
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.48);
+  background-color: transparent;
 }

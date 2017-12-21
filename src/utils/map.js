@@ -1,8 +1,9 @@
 const colors = {
-  red: '#c9302c',
+  blue: '#0275d8',
   gold: '#f0ad4e',
   green: '#449d44',
-  blue: '#0275d8',
+  red: '#c9302c',
+  straw: '#f0da99',
   white: '#ffffff',
 }
 
@@ -17,9 +18,9 @@ const addClusters = (map) => {
         property: 'point_count',
         type: 'interval',
         stops: [
-          [0, colors.green],
-          [10, colors.gold],
-          [25, colors.red],
+          [0, colors.gold],
+          [10, colors.straw],
+          [25, colors.white],
         ],
       },
       'circle-radius': {
@@ -70,10 +71,10 @@ const addUnclusteredPoints = (map) => {
     source: 'users',
     filter: ['!has', 'point_count'],
     paint: {
-      'circle-color': colors.blue,
+      'circle-color': colors.white,
       'circle-radius': 8,
       'circle-stroke-width': 1,
-      'circle-stroke-color': colors.white,
+      'circle-stroke-color': colors.straw,
     },
   })
 }

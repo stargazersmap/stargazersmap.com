@@ -8,6 +8,7 @@ class UserControls extends React.PureComponent {
     return (
       <div
         className={classNames('user-controls', {
+          // eslint-disable-next-line
           ['user-controls--minimized']: !this.props.showIntro,
         })}
       >
