@@ -1,0 +1,9 @@
+.credits {
+  position: absolute;
+  bottom: 36px;
+  z-index: 1;
+  font-size: 12px;
+  line-height: 16px;
+  left: 8px;
+  opacity: 0.84;
+}
