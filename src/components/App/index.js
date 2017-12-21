@@ -3,6 +3,7 @@ import React from 'react'
 import Resolver from '../../lib/Resolver'
 import { makeUserFeature } from '../../utils/map'
 import * as Errors from '../../constants/errors'
+import { trackVisualization } from '../../utils/tracking'
 import ErrorOutput from '../ErrorOutput'
 import Map from '../Map'
 import Search from '../Search'
@@ -95,6 +96,7 @@ class App extends React.Component {
       .then(this.handleFetchStargazers)
       .then(() => {
         this.setState({ isFetching: null })
+        trackVisualization({ owner, repository })
       })
       .catch((err) => {
         this.setState({ isFetching: null })
