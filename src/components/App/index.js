@@ -2,8 +2,10 @@ import React from 'react'
 
 import Resolver from '../../lib/Resolver'
 import { makeUserFeature } from '../../utils/map'
-import Search from '../Search'
+import ErrorOutput from '../ErrorOutput'
 import Map from '../Map'
+import Search from '../Search'
+import UserControls from '../UserControls'
 import './styles.css'
 
 class App extends React.Component {
@@ -15,6 +17,8 @@ class App extends React.Component {
     this.state = {
       isFetching: null,
       data: { features: [] },
+      error: null,
+      showIntro: true,
     }
   }
 
@@ -26,7 +30,7 @@ class App extends React.Component {
     window.removeEventListener('hashchange', this.handleHashChange)
   }
 
-  addUser = (user) => {
+  addUserToMapData = (user) => {
     this.setState((state) => ({
       data: {
         features: state.data.features.concat(makeUserFeature(user)),
@@ -36,49 +40,104 @@ class App extends React.Component {
 
   handleFetchStargazers = ({ stargazers }) => {
     if (!stargazers || stargazers.length < 1) {
-      console.warn('Found no stargazers.')
+      this.handleError('Awww man! This repo has no stars yet.')
     }
 
-    stargazers.forEach((username) => {
-      Resolver.fetchUser(username).then(this.handleFetchUser)
+    Promise.all(
+      stargazers.reduce((list, username) =>
+        list.concat(
+          Resolver.fetchUser(username)
+            .then(this.handleFetchUser)
+        ), [])
+    ).then(() => {
+      this.setState({
+        showIntro: false,
+      })
     })
   }
 
   handleFetchUser = (user) => {
     if (!user.lng || !user.lat) {
-      console.warn('Stargazer could not be located.', user)
+      // Stargazer could not be located. Silently ignoring.
     } else {
-      this.addUser(user)
+      this.addUserToMapData(user)
     }
+    return user
   }
 
   handleHashChange = () => {
-    Resolver.parseHash(window.location.hash.substr(1)).then(this.handleParseHash).catch(console.warn.bind('Error in `parseHash`.'))
+    this.resolveFromLocation()
   }
 
-  handleMapReady = () => {
-    // TODO: do something else here
-    Resolver.parseHash(window.location.hash.substr(1)).then(this.handleParseHash).catch(console.warn.bind('Error in `parseHash`'))
-  }
+  handleMapReady = () => {}
 
-  handleParseHash = ({ profile, repository }) => {
+  resolveRepository = ({ profile, repository }) => {
     this.setState({
+      data: { features: [] },
       isFetching: {
         profile,
         repository,
       },
     })
 
-    Resolver.fetchStargazers({ profile, repository }).then(this.handleFetchStargazers).then(() => {
-      this.setState({ isFetching: null })
-    }).catch(console.warn.bind('Error in `fetchStargazers`.'))
+    Resolver.fetchStargazers({ profile, repository })
+      .then(this.handleFetchStargazers)
+      .then(() => {
+        this.setState({ isFetching: null, error: '' })
+      })
+      .catch((err) => {
+        this.setState({ isFetching: null })
+        const status = err.response && err.response.status
+        switch (status) {
+          case 404:
+            this.handleError(`Those pesky 404’s! \`${profile}/${repository}\` does not seem to exist. Are you sure you spelled it correctly?`)
+            break
+          default:
+            this.handleError(`Had some problems fetching the stargazers for ${profile}/${repository}. So sorry for this!`)
+        }
+      })
+  }
+
+  handleError = (error) => {
+    this.setState({ error })
+  }
+
+  handleSearchSubmit = (query) => {
+    const [profile, repository] = query.split('/')
+
+    if (profile && repository) {
+      this.resolveRepository({ profile, repository })
+    }
+  }
+
+  resolveFromLocation = () => {
+    const hash = window.location.hash.substr(1)
+
+    if (hash.length > 0) {
+      Resolver.parseHash(hash)
+        .then(this.resolveRepository)
+        .catch(() => {
+          this.handleError('That does not look like a good hash in the address bar.')
+        })
+    }
   }
 
   render () {
+    const { data, error, isFetching, showIntro } = this.state
     return (
       <div className="app">
-        <Search isFetching={this.state.isFetching}/>
-        <Map data={this.state.data} onMapReady={this.handleMapReady}/>
+        <UserControls showIntro={showIntro}>
+          <Search
+            isFetching={isFetching}
+            onError={this.handleError}
+            onSubmit={this.handleSearchSubmit}
+          />
+          <ErrorOutput error={error}/>
+        </UserControls>
+        <Map
+          data={data}
+          onMapReady={this.handleMapReady}
+        />
       </div>
     )
   }

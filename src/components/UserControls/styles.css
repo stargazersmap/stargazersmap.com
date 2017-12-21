@@ -1,0 +1,20 @@
+.user-controls {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: calc(100vw - 32px);
+  max-width: 480px;
+  transform: translate3d(-50%, -50%, 0);
+  border-radius: 4px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.48);
+  background-color: rgba(0, 0, 0, 0.48);
+  transition: ease-out 625ms;
+  transition-property: top, left, transform;
+}
+
+.user-controls--minimized {
+  top: 16px;
+  left: 16px;
+  transform: translate3d(0, 0, 0);
+}

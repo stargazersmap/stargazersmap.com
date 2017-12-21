@@ -1,14 +1,15 @@
 import fetchJSON from '../utils/fetchJSON'
 
 export const ERROR_HASH_MALFORMATTED = 'ERROR_HASH_MALFORMATTED'
+const API_BASE_URI = 'https://stargazersmap.com/v1'
 
 class Resolver {
   static fetchStargazers ({ profile, repository }) {
-    return fetchJSON(`https://stargazersmap.com/v1/repo/${profile}/${repository}`)
+    return fetchJSON(`${API_BASE_URI}/repo/${profile}/${repository}`)
   }
 
   static fetchUser (username) {
-    return fetchJSON(`https://stargazersmap.com/v1/user/${username}`)
+    return fetchJSON(`${API_BASE_URI}/user/${username}`)
   }
 
   static parseHash (hash) {
@@ -22,11 +23,7 @@ class Resolver {
         if (!profile || !repository) {
           throw (new TypeError(ERROR_HASH_MALFORMATTED))
         }
-      } catch (e) {
-        reject({
-          error: { message: 'The supplied hash was malformatted.', type: e.message },
-        })
-      }
+      } catch (e) { reject(e) }
 
       resolve({ profile, repository })
     })
