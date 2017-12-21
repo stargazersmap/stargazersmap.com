@@ -17,8 +17,11 @@ class UserControls extends React.PureComponent {
         <div className={classnames('title', {
           ['title--minimized']: minimized,
         })}>
-          ✨ The Stargazer’s Map
-          {!minimized && ' ✨'}
+          <span className='title__emoji' role='img' aria-label='sparkles'>✨</span>
+          <span>The Stargazer’s Map</span>
+          {!minimized && (
+            <span className='title__emoji' role='img' aria-label='sparkles'>✨</span>
+          )}
         </div>
         <div className={classnames('intro', {
           ['intro--minimized']: minimized,

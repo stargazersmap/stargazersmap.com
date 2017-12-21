@@ -34,12 +34,28 @@
   text-align: center;
   text-shadow: 0 0 8px rgb(0, 0, 0);
   transform-origin: 0 0;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .title--minimized {
   text-align: left;
   transform: scale(0.75);
   margin-bottom: 4px;
+}
+
+.title__emoji {
+  position: relative;
+  top: 3px;
+  font-size: 32px;
+  line-height: 32px;
+}
+
+.title__emoji:first-child {
+  margin-right: 4px;
+}
+
+.title__emoji:last-child {
+  margin-left: 4px;
 }
 
 .intro {
