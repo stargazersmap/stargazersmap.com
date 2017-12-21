@@ -43,7 +43,8 @@ class Search extends React.Component {
 
     const inputValue =
       this.state.inputValue ||
-      buildRepoPath({ owner, repository })
+      (owner && repository && buildRepoPath({ owner, repository })) ||
+      ''
 
     this.setState({ editing: true, inputValue })
   }
