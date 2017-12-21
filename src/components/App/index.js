@@ -71,7 +71,14 @@ class App extends React.Component {
   }
 
   handleHashChange = () => {
-    this.resolveFromLocation()
+    const [owner, repository] = parseRepoPath(window.location.hash.substr(1))
+
+    if (
+      owner && repository &&
+      (owner !== this.state.owner || repository !== this.state.repository)
+    ) {
+      this.resolveFromLocation()
+    }
   }
 
   handleMapReady = () => {
@@ -96,7 +103,6 @@ class App extends React.Component {
     const repoPath = buildRepoPath({ owner, repository })
 
     if (window.location.hash.indexOf(repoPath) < 0) {
-      console.log('setting hash again')
       window.location.hash = repoPath
     }
 

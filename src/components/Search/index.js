@@ -68,6 +68,7 @@ class Search extends React.Component {
     if (isValidRepoPath(inputValue)) {
       this.props.onSubmit(inputValue)
       this.input.blur()
+      this.setState({ editing: false })
     } else {
       this.props.onError(Errors.GITHUB_HANDLE_INVALID)
     }
