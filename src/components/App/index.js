@@ -69,9 +69,17 @@ class App extends React.Component {
     this.resolveFromLocation()
   }
 
-  handleMapReady = () => {}
+  handleMapReady = () => {
+    if (window.location.hash.substr(1)) {
+      this.resolveFromLocation()
+    }
+  }
 
   resolveRepository = ({ profile, repository }) => {
+    if (this.state.isFetching) {
+      return
+    }
+
     this.setState({
       data: { features: [] },
       isFetching: {
