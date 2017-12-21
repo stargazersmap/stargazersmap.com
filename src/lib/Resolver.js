@@ -1,11 +1,10 @@
 import fetchJSON from '../utils/fetchJSON'
-
-export const ERROR_HASH_MALFORMATTED = 'ERROR_HASH_MALFORMATTED'
+import * as Errors from '../constants/errors'
 const API_BASE_URI = 'https://stargazersmap.com/v1'
 
 class Resolver {
-  static fetchStargazers ({ profile, repository }) {
-    return fetchJSON(`${API_BASE_URI}/repo/${profile}/${repository}`)
+  static fetchStargazers ({ owner, repository }) {
+    return fetchJSON(`${API_BASE_URI}/repo/${owner}/${repository}`)
   }
 
   static fetchUser (username) {
@@ -14,18 +13,18 @@ class Resolver {
 
   static parseHash (hash) {
     return new Promise((resolve, reject) => {
-      let profile = null
+      let owner = null
       let repository = null
 
       try {
-        [ profile, repository ] = hash.split('/')
+        [owner, repository] = hash.split('/')
 
-        if (!profile || !repository) {
-          throw (new TypeError(ERROR_HASH_MALFORMATTED))
+        if (!owner || !repository) {
+          throw (new TypeError(Errors.LOCATION_HASH_INVALID))
         }
       } catch (e) { reject(e) }
 
-      resolve({ profile, repository })
+      resolve({ owner, repository })
     })
   }
 }

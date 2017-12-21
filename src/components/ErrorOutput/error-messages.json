@@ -1,0 +1,8 @@
+{
+  "DEFAULT": "An error occured while trying to process your request.",
+  "FETCH_STARGAZERS": "Had some problems fetching the stargazers for `{{owner}}/{{repository}}`. So sorry for this!",
+  "FETCH_STARGAZERS_404": "Those pesky 404’s! `{{owner}}/{{repository}}` does not seem to exist. Are you sure you spelled it correctly?",
+  "REPO_HAS_NO_STARGAZERS": "Awww! This repo has no stars yet.",
+  "LOCATION_HASH_INVALID": "That does not look like a good hash in the address bar.",
+  "GITHUB_HANDLE_INVALID": "The repository name you entered does not seem to be a valid Github repo. Are you sure you spelled it correctly?"
+}

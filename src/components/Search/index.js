@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { KEY_CODE_ENTER } from '../../constants/key-codes'
+import * as Errors from '../../constants/errors'
 import './styles.css'
-
-const KEY_CODE_ENTER = 13
 
 class Search extends React.Component {
   constructor () {
@@ -47,14 +47,14 @@ class Search extends React.Component {
       this.props.onSubmit(inputValue)
       this.input.blur()
     } else {
-      this.props.onError('The repository name you entered does not seem to be a valid Github repo. Are you sure you spelled it correctly?')
+      this.props.onError(Errors.GITHUB_HANDLE_INVALID)
     }
   }
 
   renderProxyChildren (str) {
     const parts = str.length
       ? str.split('/')
-      : ['username', 'repository']
+      : ['owner', 'repository']
 
     return parts.length > 1
       ? [
@@ -88,7 +88,7 @@ class Search extends React.Component {
           onKeyDown={this.handleKeyDown}
           ref={this.registerInputRef}
           spellCheck='false'
-          value={this.state.inputValue}
+          value={inputValue}
         />
         <div className='search__input-proxy'>
           {this.renderProxyChildren(inputValue)}

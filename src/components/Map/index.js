@@ -1,14 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
+
 import {
   addMapLayers,
   addMapSources,
 } from '../../utils/map'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import { MAPBOX_ACCESS_TOKEN } from '../../constants/mapbox'
 import './styles.css'
-
-const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaG9va3V1IiwiYSI6ImNqYWZtc3B1bjE2ZWYzM3F1MmdqdHcxb3cifQ.Ru_O7FWsJG0xN8tpn_YiDQ'
 
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
 

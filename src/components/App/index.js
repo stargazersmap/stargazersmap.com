@@ -2,6 +2,7 @@ import React from 'react'
 
 import Resolver from '../../lib/Resolver'
 import { makeUserFeature } from '../../utils/map'
+import * as Errors from '../../constants/errors'
 import ErrorOutput from '../ErrorOutput'
 import Map from '../Map'
 import Search from '../Search'
@@ -40,7 +41,9 @@ class App extends React.Component {
 
   handleFetchStargazers = ({ stargazers }) => {
     if (!stargazers || stargazers.length < 1) {
-      this.handleError('Awww man! This repo has no stars yet.')
+      const e = new Error(Errors.REPO_HAS_NO_STARGAZERS)
+      e.response = { status: 204 }
+      throw e
     }
 
     Promise.all(
@@ -75,33 +78,36 @@ class App extends React.Component {
     }
   }
 
-  resolveRepository = ({ profile, repository }) => {
+  resolveRepository = ({ owner, repository }) => {
     if (this.state.isFetching) {
       return
     }
 
     this.setState({
       data: { features: [] },
-      isFetching: {
-        profile,
-        repository,
-      },
+      error: '',
+      isFetching: true,
+      owner,
+      repository,
     })
 
-    Resolver.fetchStargazers({ profile, repository })
+    Resolver.fetchStargazers({ owner, repository })
       .then(this.handleFetchStargazers)
       .then(() => {
-        this.setState({ isFetching: null, error: '' })
+        this.setState({ isFetching: null })
       })
       .catch((err) => {
         this.setState({ isFetching: null })
         const status = err.response && err.response.status
         switch (status) {
+          case 204:
+            this.handleError(Errors.REPO_HAS_NO_STARGAZERS)
+            break
           case 404:
-            this.handleError(`Those pesky 404’s! \`${profile}/${repository}\` does not seem to exist. Are you sure you spelled it correctly?`)
+            this.handleError(Errors.FETCH_STARGAZERS_404, { owner, repository })
             break
           default:
-            this.handleError(`Had some problems fetching the stargazers for ${profile}/${repository}. So sorry for this!`)
+            this.handleError(Errors.FETCH_STARGAZERS, { owner, repository })
         }
       })
   }
@@ -111,10 +117,10 @@ class App extends React.Component {
   }
 
   handleSearchSubmit = (query) => {
-    const [profile, repository] = query.split('/')
+    const [owner, repository] = query.split('/')
 
-    if (profile && repository) {
-      this.resolveRepository({ profile, repository })
+    if (owner && repository) {
+      this.resolveRepository({ owner, repository })
     }
   }
 
@@ -125,13 +131,21 @@ class App extends React.Component {
       Resolver.parseHash(hash)
         .then(this.resolveRepository)
         .catch(() => {
-          this.handleError('That does not look like a good hash in the address bar.')
+          this.handleError(Errors.LOCATION_HASH_INVALID)
         })
     }
   }
 
   render () {
-    const { data, error, isFetching, showIntro } = this.state
+    const {
+      data,
+      error,
+      isFetching,
+      owner,
+      repository,
+      showIntro,
+    } = this.state
+
     return (
       <div className="app">
         <UserControls showIntro={showIntro}>
@@ -139,8 +153,14 @@ class App extends React.Component {
             isFetching={isFetching}
             onError={this.handleError}
             onSubmit={this.handleSearchSubmit}
+            owner={owner}
+            repository={repository}
           />
-          <ErrorOutput error={error}/>
+          <ErrorOutput
+            error={error}
+            owner={owner}
+            repository={repository}
+          />
         </UserControls>
         <Map
           data={data}

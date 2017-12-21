@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import template from '../../utils/template'
+import errorMessages from './error-messages'
 import './styles.css'
 
 const SAD_EMOJIS = ['☹️', '😕', '😖', '😩', '😧', '😭', '🤔', '😬', '🤕']
@@ -15,9 +17,9 @@ class ErrorOutput extends React.Component {
   }
 
   render () {
-    const hasError =
-      this.props.error &&
-      this.props.error.length > 0
+    const { error, owner, repository } = this.props
+    const hasError = error && error.length > 0
+    const readableMsg = errorMessages[error] || errorMessages.DEFAULT
 
     return (
       <div className='error-output'>
@@ -25,7 +27,8 @@ class ErrorOutput extends React.Component {
           <div className='error-output__emoji'>{getRandomEmoji()}</div>
         )}
         {hasError && (
-          <div className='error-output__msg'>{this.props.error}</div>
+          <div className='error-output__msg'>
+            {template(readableMsg, { owner, repository })}</div>
         )}
       </div>
     )
@@ -34,6 +37,8 @@ class ErrorOutput extends React.Component {
 
 ErrorOutput.propTypes = {
   error: PropTypes.string,
+  owner: PropTypes.string,
+  respository: PropTypes.string,
 }
 
 export default ErrorOutput
