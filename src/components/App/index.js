@@ -2,6 +2,7 @@ import React from 'react'
 
 import Resolver from '../../lib/Resolver'
 import { makeUserFeature } from '../../utils/map'
+import { parseRepoPath } from '../../utils/github'
 import * as Errors from '../../constants/errors'
 import { trackVisualization } from '../../utils/tracking'
 import ErrorOutput from '../ErrorOutput'
@@ -119,7 +120,7 @@ class App extends React.Component {
   }
 
   handleSearchSubmit = (query) => {
-    const [owner, repository] = query.split('/')
+    const [owner, repository] = parseRepoPath(query)
 
     if (owner && repository) {
       this.resolveRepository({ owner, repository })

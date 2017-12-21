@@ -1,6 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import {
+  buildRepoPath,
+  isValidRepoPath,
+  parseRepoPath,
+} from '../../utils/github'
 import { KEY_CODE_ENTER } from '../../constants/key-codes'
 import * as Errors from '../../constants/errors'
 import './styles.css'
@@ -12,6 +17,7 @@ class Search extends React.Component {
     this.input = null
     this.state = {
       inputValue: '',
+      editing: false,
     }
   }
 
@@ -32,6 +38,16 @@ class Search extends React.Component {
     }))
   }
 
+  handleFocus = () => {
+    const { owner, repository } = this.props
+
+    const inputValue =
+      this.state.inputValue ||
+      buildRepoPath({ owner, repository })
+
+    this.setState({ editing: true, inputValue })
+  }
+
   handleKeyDown = (e) => {
     if (e.keyCode === KEY_CODE_ENTER) {
       this.handleSubmit(e)
@@ -41,9 +57,14 @@ class Search extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault()
     e.stopPropagation()
+
+    if (this.props.isFetching) {
+      return
+    }
+
     const { inputValue } = this.state
 
-    if (/^[a-z0-9-][a-z0-9-]*[a-z0-9]\/[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(inputValue)) {
+    if (isValidRepoPath(inputValue)) {
       this.props.onSubmit(inputValue)
       this.input.blur()
     } else {
@@ -53,7 +74,7 @@ class Search extends React.Component {
 
   renderProxyChildren (str) {
     const parts = str.length
-      ? str.split('/')
+      ? parseRepoPath(str)
       : ['owner', 'repository']
 
     return parts.length > 1
@@ -70,8 +91,12 @@ class Search extends React.Component {
   }
 
   render () {
-    const { isFetching } = this.props
-    const { inputValue } = this.state
+    const { isFetching, owner, repository } = this.props
+    const { inputValue, editing } = this.state
+
+    const value = editing || !owner || !repository
+      ? inputValue
+      : buildRepoPath({ owner, repository })
 
     return (
       <form
@@ -83,15 +108,16 @@ class Search extends React.Component {
           autoCorrect='off'
           autoCapitalize='off'
           className='search__input'
-          disabled={!!isFetching}
+          disabled={isFetching}
+          onFocus={this.handleFocus}
           onChange={this.handleChange}
           onKeyDown={this.handleKeyDown}
           ref={this.registerInputRef}
           spellCheck='false'
-          value={inputValue}
+          value={value}
         />
         <div className='search__input-proxy'>
-          {this.renderProxyChildren(inputValue)}
+          {this.renderProxyChildren(value)}
         </div>
         {isFetching && <div className='search__busy'/>}
       </form>
@@ -100,8 +126,11 @@ class Search extends React.Component {
 }
 
 Search.propTypes = {
+  isFetching: PropTypes.bool,
   onError: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  owner: PropTypes.string,
+  repository: PropTypes.string,
 }
 
 export default Search

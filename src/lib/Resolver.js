@@ -1,5 +1,7 @@
 import fetchJSON from '../utils/fetchJSON'
+import { parseRepoPath } from '../utils/github'
 import * as Errors from '../constants/errors'
+
 const API_BASE_URI = 'https://stargazersmap.com/v1'
 
 class Resolver {
@@ -17,7 +19,7 @@ class Resolver {
       let repository = null
 
       try {
-        [owner, repository] = hash.split('/')
+        [owner, repository] = parseRepoPath(hash)
 
         if (!owner || !repository) {
           throw (new TypeError(Errors.LOCATION_HASH_INVALID))
