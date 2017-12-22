@@ -23,8 +23,8 @@ class Search extends React.Component {
 
   sanitize = (str) => {
     return str
-      .toLowerCase()
-      .replace(/^-|[^a-z0-9-/]/g, '')
+      // .toLowerCase()
+      .replace(/^-|[^a-z0-9-/]/ig, '')
       .replace(/-\/|\/-/, '/')
       .replace(/-{2,}/g, '-')
       .split('/')

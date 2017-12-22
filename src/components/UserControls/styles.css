@@ -58,6 +58,10 @@
   margin-left: 4px;
 }
 
+.user-controls--minimized .title__emoji:first-child {
+  margin-right: 12px;
+}
+
 .intro {
   text-align: center;
   margin-bottom: 24px;
