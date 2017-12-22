@@ -1,0 +1,14 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: stretch;
+}
+
+.app * {
+  /**
+   * Kill the transitions for now. They just don’t
+   * work well on the map.
+   */
+  transition: none !important;
+}
