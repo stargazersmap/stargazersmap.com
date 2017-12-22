@@ -19,7 +19,7 @@ class App extends React.Component {
     this.map = null
 
     this.state = {
-      isFetching: null,
+      isFetching: false,
       data: { features: [] },
       error: null,
       showIntro: true,
@@ -58,6 +58,7 @@ class App extends React.Component {
     ).then(() => {
       this.setState({
         showIntro: false,
+        isFetching: false,
       })
     })
   }
@@ -110,12 +111,13 @@ class App extends React.Component {
     Resolver.fetchStargazers({ owner, repository })
       .then(this.handleFetchStargazers)
       .then(() => {
-        this.setState({ isFetching: null })
         trackVisualization({ owner, repository })
       })
       .catch((err) => {
-        this.setState({ isFetching: null })
+        this.setState({ isFetching: false })
+
         const status = err.response && err.response.status
+        
         switch (status) {
           case 204:
             this.handleError(Errors.REPO_HAS_NO_STARGAZERS)
