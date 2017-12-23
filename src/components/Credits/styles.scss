@@ -1,0 +1,11 @@
+@import '../../sass-vars/layout';
+
+.credits {
+  position: absolute;
+  bottom: 4.5 * $step;
+  z-index: 1;
+  font-size: 0.75 * $base-font-size;
+  line-height: 1.333;
+  left: $step;
+  opacity: 0.84;
+}

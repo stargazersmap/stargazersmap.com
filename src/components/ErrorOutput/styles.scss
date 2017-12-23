@@ -1,0 +1,19 @@
+@import '../../sass-vars/layout';
+
+.error-output {
+  display: flex;
+  margin: $step 0;
+  padding: $step;
+  align-items: center;
+
+  &__emoji {
+    flex-shrink: 0;
+    margin-right: $step * 2;
+    font-size: 1.5 * $base-font-size;
+    line-height: 1;
+  }
+
+  &__msg {
+    flex-grow: 1;
+  }
+}
