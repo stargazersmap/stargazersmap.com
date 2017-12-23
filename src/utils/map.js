@@ -1,38 +1,56 @@
-const colors = {
-  blue: '#0275d8',
-  gold: '#f0ad4e',
-  green: '#449d44',
-  red: '#c9302c',
-  straw: '#f0da99',
-  white: '#ffffff',
+const Colors = {
+  GOLD: '#fbe067',
+  STRAW: '#faedb5',
+  WHITE: '#ffffff',
+  DARK_GREY: '#2b2a29',
 }
 
 const addClusters = (map) => {
-  map.addLayer({
-    id: 'clusters',
-    type: 'circle',
-    source: 'users',
-    filter: ['has', 'point_count'],
-    paint: {
-      'circle-color': {
-        property: 'point_count',
-        type: 'interval',
-        stops: [
-          [0, colors.gold],
-          [10, colors.straw],
-          [25, colors.white],
-        ],
-      },
-      'circle-radius': {
-        property: 'point_count',
-        type: 'interval',
-        stops: [
-          [0, 15],
-          [10, 20],
-          [25, 25],
-        ],
-      },
+  const _addLayer = (id, paint) => {
+    map.addLayer({
+      id,
+      type: 'circle',
+      source: 'users',
+      filter: ['has', 'point_count'],
+      paint,
+    })
+  }
+
+  _addLayer('clusters', {
+    'circle-color': {
+      property: 'point_count',
+      type: 'interval',
+      stops: [
+        [0, Colors.GOLD],
+        [10, Colors.STRAW],
+        [25, Colors.WHITE],
+      ],
     },
+    'circle-radius': {
+      property: 'point_count',
+      type: 'interval',
+      stops: [
+        [0, 15],
+        [10, 20],
+        [25, 25],
+      ],
+    },
+  })
+
+  _addLayer('clusters-halo', {
+    'circle-blur': 2,
+    'circle-color': Colors.WHITE,
+    'circle-radius': {
+      property: 'point_count',
+      type: 'interval',
+      stops: [
+        [0, 30],
+        [10, 40],
+        [25, 50],
+      ],
+    },
+    'circle-stroke-width': 5,
+    'circle-stroke-color': Colors.STRAW,
   })
 }
 
@@ -47,10 +65,13 @@ const addClustersCount = (map) => {
       'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': 12,
     },
+    paint: {
+      'text-color': Colors.DARK_GREY,
+    },
   })
 }
 
-const addClustersLabels = (map) => {
+const addLocationLabels = (map) => {
   map.addLayer({
     id: 'clusters-label',
     type: 'symbol',
@@ -58,31 +79,46 @@ const addClustersLabels = (map) => {
     layout: {
       'text-field': '{location}',
       'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-      'text-size': 10,
       'text-offset': [0, 2],
+      'text-size': 10,
+    },
+    paint: {
+      'text-color': Colors.WHITE,
+      'text-halo-color': Colors.DARK_GREY,
+      'text-halo-width': 2,
     },
   })
 }
 
 const addUnclusteredPoints = (map) => {
-  map.addLayer({
-    id: 'unclustered-point',
-    type: 'circle',
-    source: 'users',
-    filter: ['!has', 'point_count'],
-    paint: {
-      'circle-color': colors.white,
-      'circle-radius': 8,
-      'circle-stroke-width': 1,
-      'circle-stroke-color': colors.straw,
-    },
+  const _addLayer = (id, paint) => {
+    map.addLayer({
+      id,
+      type: 'circle',
+      source: 'users',
+      filter: ['!has', 'point_count'],
+      paint,
+    })
+  }
+
+  _addLayer('unclustered-point-halo', {
+    'circle-color': Colors.WHITE,
+    'circle-radius': 8,
+    'circle-stroke-width': 2,
+    'circle-stroke-color': Colors.STRAW,
+    'circle-blur': 1,
+  })
+
+  _addLayer('unclustered-point', {
+    'circle-color': Colors.WHITE,
+    'circle-radius': 4,
   })
 }
 
 export const addMapLayers = (map) => {
   addClusters(map)
   addClustersCount(map)
-  addClustersLabels(map)
+  addLocationLabels(map)
   addUnclusteredPoints(map)
 }
 
