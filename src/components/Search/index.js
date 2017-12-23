@@ -22,13 +22,22 @@ class Search extends React.Component {
   }
 
   sanitize = (str) => {
-    return str
-      .replace(/^-|[^a-z0-9-/]/ig, '')
-      .replace(/-\/|\/-/, '/')
-      .replace(/-{2,}/g, '-')
-      .split('/')
-      .slice(0, 2)
-      .join('/')
+    const INVALID_CHARS = /[^a-z0-9-/._]/gi
+    const INVALID_OWNER_CHARS = /[^a-z0-9-]/g
+    const MULTIPLE_DASHES = /-{2,}/g
+    const MATCHSTICK_ARMS = /^-|-$/
+
+    let [owner, repository] = parseRepoPath(str.replace(INVALID_CHARS, ''))
+
+    owner = owner
+      .replace(INVALID_OWNER_CHARS, '')
+      .replace(MATCHSTICK_ARMS, '')
+      .replace(MULTIPLE_DASHES, '-') ||
+      ''
+
+    return typeof repository !== 'undefined'
+      ? `${owner}/${repository}`
+      : owner
   }
 
   handleChange = ({ target: { value } }) => {
