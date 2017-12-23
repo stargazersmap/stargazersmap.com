@@ -37,17 +37,27 @@
   }
 
   &__input-proxy {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     border-radius: $border-radius;
     box-shadow: inset 2px 3px 6px -2px rgba($color-black, 0.84);
     background-color: $color-dark-grey;
     min-height: 2.25 * $base-font-size;
     transition: $transition-curve $transition-duration-fast box-shadow;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   &__input:focus + &__input-proxy {
     box-shadow:
       inset 2px 5px 5px -2px rgba($color-black, 0.84),
       0 0 8px rgba($color-straw, 0.64);
+
+    &--overflowing {
+      justify-content: flex-end;
+    }
   }
 
   &__slash {
