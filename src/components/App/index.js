@@ -42,25 +42,50 @@ class App extends React.Component {
     }))
   }
 
-  handleFetchStargazers = ({ stargazers }) => {
+  catchFetchError = (err) => {
+    this.setState({ isFetching: false })
+
+    const status = err.response && err.response.status
+
+    switch (status) {
+      case 204:
+        this.handleError(Errors.REPO_HAS_NO_STARGAZERS)
+        break
+      case 404:
+        this.handleError(Errors.FETCH_STARGAZERS_404)
+        break
+      default:
+        this.handleError(Errors.FETCH_STARGAZERS)
+    }
+  }
+
+  handleFetchStargazers = ({ stargazers, _links }) => {
+    this.setState({ showIntro: false })
+
     if (!stargazers || stargazers.length < 1) {
       const e = new Error(Errors.REPO_HAS_NO_STARGAZERS)
       e.response = { status: 204 }
       throw e
     }
 
+    const hasNextPage = _links && _links.next && _links.next.href
+    const done = () => { this.setState({ isFetching: false }) }
+    const next = hasNextPage
+      ? () => {
+        Resolver.fetchNextPage(_links.next.href)
+          .then(this.handleFetchStargazers)
+          .catch(this.catchFetchError)
+      }
+      : done
+
     Promise.all(
       stargazers.reduce((list, username) =>
         list.concat(
           Resolver.fetchUser(username)
             .then(this.handleFetchUser)
+            .catch(this.noop)
         ), [])
-    ).then(() => {
-      this.setState({
-        showIntro: false,
-        isFetching: false,
-      })
-    })
+    ).then(next)
   }
 
   handleFetchUser = (user) => {
@@ -89,6 +114,8 @@ class App extends React.Component {
     }
   }
 
+  noop = () => {}
+
   resolveRepository = ({ owner, repository }) => {
     if (this.state.isFetching) {
       return
@@ -113,22 +140,7 @@ class App extends React.Component {
       .then(() => {
         trackVisualization({ owner, repository })
       })
-      .catch((err) => {
-        this.setState({ isFetching: false })
-
-        const status = err.response && err.response.status
-        
-        switch (status) {
-          case 204:
-            this.handleError(Errors.REPO_HAS_NO_STARGAZERS)
-            break
-          case 404:
-            this.handleError(Errors.FETCH_STARGAZERS_404, { owner, repository })
-            break
-          default:
-            this.handleError(Errors.FETCH_STARGAZERS, { owner, repository })
-        }
-      })
+      .catch(this.catchFetchError)
   }
 
   handleError = (error) => {

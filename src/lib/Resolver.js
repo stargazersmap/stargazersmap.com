@@ -9,6 +9,10 @@ class Resolver {
     return fetchJSON(`${API_BASE_URI}/repo/${owner}/${repository}`)
   }
 
+  static fetchNextPage (next) {
+    return fetchJSON(next)
+  }
+
   static fetchUser (username) {
     return fetchJSON(`${API_BASE_URI}/user/${username}`)
   }
