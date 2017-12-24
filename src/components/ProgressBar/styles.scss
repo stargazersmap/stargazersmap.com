@@ -1,0 +1,26 @@
+@import '../../sass-vars/colors';
+@import '../../sass-vars/effects';
+@import '../../sass-vars/layout';
+
+.progress-bar {
+  background-color: rgba($color-straw, 0.42);
+  height: 3px;
+  width: 100%;
+  transition: opacity $transition-duration-slow $transition-curve;
+  overflow: hidden;
+  opacity: 0.28;
+
+  &--hide {
+    opacity: 0;
+  }
+
+  &__progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    background-color: $color-straw;
+    transition: width $transition-duration-slow $transition-curve;
+  }
+}

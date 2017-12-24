@@ -9,6 +9,7 @@ import {
 } from '../../utils/github'
 import { KEY_CODE_ENTER } from '../../constants/key-codes'
 import * as Errors from '../../constants/errors'
+import ProgressBar from '../ProgressBar'
 import './styles.css'
 
 class Search extends React.Component {
@@ -127,7 +128,7 @@ class Search extends React.Component {
   }
 
   render () {
-    const { isFetching, owner, repository } = this.props
+    const { isFetching, owner, progress, repository } = this.props
     const { contentOverflowing, editing, inputValue } = this.state
 
     const value = editing || !owner || !repository
@@ -160,6 +161,13 @@ class Search extends React.Component {
           {this.renderProxyChildren(value)}
         </div>
         {isFetching && <div className='search__busy'/>}
+        {!isNaN(progress) && (
+          <ProgressBar
+            className='search__progress'
+            isFetching={isFetching}
+            progress={progress}
+          />
+        )}
       </form>
     )
   }
@@ -170,6 +178,7 @@ Search.propTypes = {
   onError: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   owner: PropTypes.string,
+  progress: PropTypes.number,
   repository: PropTypes.string,
 }
 
