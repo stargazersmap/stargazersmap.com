@@ -23,6 +23,8 @@ class App extends React.Component {
       data: { features: [] },
       error: null,
       showIntro: true,
+      numTotal: 0,
+      numResolved: 0,
     }
   }
 
@@ -65,8 +67,17 @@ class App extends React.Component {
       .catch(this.catchFetchError)
   }
 
+  getProgress = () => {
+    return this.state.numResolved / this.state.numTotal
+  }
+
   handleFetchStargazers = ({ stargazers, _links, total }) => {
-    this.setState({ showIntro: false })
+    this.setState((state) => ({
+      showIntro: false,
+      numTotal: state.numTotal === 0
+        ? (total || stargazers.length)
+        : state.numTotal,
+    }))
 
     if (!stargazers || stargazers.length < 1) {
       const e = new Error(Errors.REPO_HAS_NO_STARGAZERS)
@@ -93,11 +104,16 @@ class App extends React.Component {
   }
 
   handleFetchUser = (user) => {
+    this.setState((state) => ({
+      numResolved: state.numResolved + 1,
+    }))
+
     if (!user.lng || !user.lat) {
       // Stargazer could not be located. Silently ignoring.
     } else {
       this.addUserToMapData(user)
     }
+
     return user
   }
 
@@ -129,6 +145,8 @@ class App extends React.Component {
       data: { features: [] },
       error: '',
       isFetching: true,
+      numTotal: 0,
+      numResolved: 0,
       owner,
       repository,
     })
@@ -189,6 +207,7 @@ class App extends React.Component {
             onError={this.handleError}
             onSubmit={this.handleSearchSubmit}
             owner={owner}
+            progress={this.getProgress()}
             repository={repository}
           />
           <ErrorOutput
