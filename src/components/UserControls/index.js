@@ -11,11 +11,11 @@ class UserControls extends React.PureComponent {
     return (
       <div
         className={classnames('user-controls', {
-          ['user-controls--minimized']: minimized,
+          'user-controls--minimized': minimized,
         })}
       >
         <div className={classnames('title', {
-          ['title--minimized']: minimized,
+          'title--minimized': minimized,
         })}>
           <span className='title__emoji' role='img' aria-label='sparkles'>✨</span>
           <span>Stargazers Map</span>
@@ -24,7 +24,7 @@ class UserControls extends React.PureComponent {
           )}
         </div>
         <div className={classnames('intro', {
-          ['intro--minimized']: minimized,
+          'intro--minimized': minimized,
         })}>
           Enter a GitHub repo path to see its stargazers.
         </div>

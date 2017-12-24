@@ -1,0 +1,29 @@
+@import './sass-vars/colors';
+@import './sass-vars/layout';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  font-family: $font-family-sans;
+  font-size: $base-font-size;
+  line-height: $base-line-height;
+  background-color: $color-dark-grey;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+a,
+html {
+  color: rgba($color-straw, 0.88);
+}

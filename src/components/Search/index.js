@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 import {
   buildRepoPath,
@@ -18,17 +19,51 @@ class Search extends React.Component {
     this.state = {
       inputValue: '',
       editing: false,
+      contentOverflowing: false,
+    }
+  }
+
+  componentWillUpdate (_, nextState) {
+    if (this.input) {
+      const { contentOverflowing } = this.state
+
+      if (
+        this.input.scrollWidth > this.input.clientWidth &&
+        (
+          !contentOverflowing ||
+          contentOverflowing !== nextState.contentOverflowing
+        )
+      ) {
+        this.setState({ contentOverflowing: true })
+      } else if (
+        contentOverflowing &&
+        (
+          contentOverflowing !== nextState.contentOverflowing ||
+          this.input.scrollWidth <= this.input.clientWidth
+        )
+      ) {
+        this.setState({ contentOverflowing: false })
+      }
     }
   }
 
   sanitize = (str) => {
-    return str
-      .replace(/^-|[^a-z0-9-/]/ig, '')
-      .replace(/-\/|\/-/, '/')
-      .replace(/-{2,}/g, '-')
-      .split('/')
-      .slice(0, 2)
-      .join('/')
+    const INVALID_CHARS = /[^a-z0-9-/._]/gi
+    const INVALID_OWNER_CHARS = /[^a-z0-9-]/g
+    const MULTIPLE_DASHES = /-{2,}/g
+    const MATCHSTICK_ARMS = /^-|-$/
+
+    let [owner, repository] = parseRepoPath(str.replace(INVALID_CHARS, ''))
+
+    owner = owner
+      .replace(INVALID_OWNER_CHARS, '')
+      .replace(MATCHSTICK_ARMS, '')
+      .replace(MULTIPLE_DASHES, '-') ||
+      ''
+
+    return typeof repository !== 'undefined'
+      ? `${owner}/${repository}`
+      : owner
   }
 
   handleChange = ({ target: { value } }) => {
@@ -80,9 +115,9 @@ class Search extends React.Component {
 
     return parts.length > 1
       ? [
-        parts[0],
+        <span key='owner' className='search__owner'>{parts[0]}</span>,
         <span key='slash' className='search__slash'>/</span>,
-        parts[1],
+        <span key='repository' className='search__repository'>{parts[1]}</span>,
       ]
       : parts
   }
@@ -93,7 +128,7 @@ class Search extends React.Component {
 
   render () {
     const { isFetching, owner, repository } = this.props
-    const { inputValue, editing } = this.state
+    const { contentOverflowing, editing, inputValue } = this.state
 
     const value = editing || !owner || !repository
       ? inputValue
@@ -117,7 +152,11 @@ class Search extends React.Component {
           spellCheck='false'
           value={value}
         />
-        <div className='search__input-proxy'>
+        <div
+          className={classnames('search__input-proxy', {
+            'search__input-proxy--overflowing': contentOverflowing,
+          })}
+        >
           {this.renderProxyChildren(value)}
         </div>
         {isFetching && <div className='search__busy'/>}

@@ -1,0 +1,73 @@
+@import '../../sass-vars/colors';
+@import '../../sass-vars/layout';
+
+.user-controls {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  padding: $step;
+  width: calc(100vw - #{4 * $step});
+  max-width: $controls-max-width;
+  transform: translate(-50%, -50%);
+  border-radius: $border-radius;
+  box-shadow: 0 0 0 9999px rgba($color-black, 0.48);
+  background-color: rgba($color-black, 0.48);
+
+  &--minimized {
+    top: $step;
+    left: $step;
+    transform: translate(0, 0);
+    box-shadow: 0 0 0 0 rgba($color-black, 0.48);
+    background-color: transparent;
+    overflow: visible;
+  }
+}
+
+.title {
+  margin-bottom: 2.25 * $step;
+  font-size: 1.5 * $base-font-size;
+  line-height: 1.333;
+  white-space: nowrap;
+  text-align: center;
+  text-shadow: 0 0 8px $color-black;
+  transform-origin: 0 0;
+  font-family: $font-family-monospace;
+
+  &--minimized {
+    text-align: left;
+    transform: scale(0.75);
+    margin-bottom: $step / 2;
+  }
+
+  &__emoji {
+    position: relative;
+    top: 3px;
+    font-size: 2 * $base-font-size;
+    line-height: 1;
+
+    &:first-child {
+      margin-right: $step / 2;
+
+      .user-controls--minimized & {
+        margin-right: 1.5 * $step;
+      }
+    }
+
+    &:last-child {
+      margin-left: $step / 2;
+    }
+  }
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 3 * $step;
+
+  &--minimized {
+    transform: scaleY(0);
+    height: 0;
+    margin: 0;
+    opacity: 0;
+  }
+}
