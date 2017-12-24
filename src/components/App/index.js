@@ -59,7 +59,13 @@ class App extends React.Component {
     }
   }
 
-  handleFetchStargazers = ({ stargazers, _links }) => {
+  fetchNextPage = (nextPage) => {
+    Resolver.fetchNextPage(nextPage)
+      .then(this.handleFetchStargazers)
+      .catch(this.catchFetchError)
+  }
+
+  handleFetchStargazers = ({ stargazers, _links, total }) => {
     this.setState({ showIntro: false })
 
     if (!stargazers || stargazers.length < 1) {
@@ -68,24 +74,22 @@ class App extends React.Component {
       throw e
     }
 
-    const hasNextPage = _links && _links.next && _links.next.href
+    const nextPage = _links && _links.next && _links.next.href
     const done = () => { this.setState({ isFetching: false }) }
-    const next = hasNextPage
-      ? () => {
-        Resolver.fetchNextPage(_links.next.href)
-          .then(this.handleFetchStargazers)
-          .catch(this.catchFetchError)
-      }
+    const next = nextPage
+      ? () => this.fetchNextPage(nextPage)
       : done
 
-    Promise.all(
-      stargazers.reduce((list, username) =>
-        list.concat(
-          Resolver.fetchUser(username)
-            .then(this.handleFetchUser)
-            .catch(this.noop)
-        ), [])
-    ).then(next)
+    Promise
+      .all(
+        stargazers.reduce((list, username) =>
+          list.concat(
+            Resolver.fetchUser(username)
+              .then(this.handleFetchUser)
+              .catch(this.noop)
+          ), [])
+      )
+      .then(next)
   }
 
   handleFetchUser = (user) => {
