@@ -5,6 +5,8 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "mapbox-gl": "^0.42.2",
+    "node-sass-chokidar": "0.0.3",
+    "npm-run-all": "^4.1.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.0.17"
