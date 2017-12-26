@@ -24,7 +24,13 @@ class ErrorOutput extends React.Component {
     return (
       <div className='error-output'>
         {hasError && (
-          <div className='error-output__emoji'>{getRandomEmoji()}</div>
+          <div
+            className='error-output__emoji'
+            role='img'
+            aria-label=':-('
+          >
+            {getRandomEmoji()}
+          </div>
         )}
         {hasError && (
           <div className='error-output__msg'>
