@@ -10,8 +10,7 @@
   width: calc(100vw - #{4 * $step});
   max-width: $controls-max-width;
   transform: translate(-50%, -50%);
-  border-radius: $border-radius;
-  box-shadow: 0 0 0 9999px rgba($color-black, 0.48);
+  box-shadow: 0 0 0 100vw rgba($color-black, 0.48);
   background-color: rgba($color-black, 0.48);
 
   &--minimized {
@@ -21,6 +20,10 @@
     box-shadow: 0 0 0 0 rgba($color-black, 0.48);
     background-color: transparent;
     overflow: visible;
+  }
+
+  @media (orientation: portrait) {
+    box-shadow: 0 0 0 100vh rgba($color-black, 0.48);
   }
 }
 

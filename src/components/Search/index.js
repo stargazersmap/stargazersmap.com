@@ -18,6 +18,7 @@ class Search extends React.Component {
 
     this.input = null
     this.state = {
+      focused: false,
       inputValue: '',
       editing: false,
       contentOverflowing: false,
@@ -50,7 +51,7 @@ class Search extends React.Component {
 
   sanitize = (str) => {
     const INVALID_CHARS = /[^a-z0-9-/._]/gi
-    const INVALID_OWNER_CHARS = /[^a-z0-9-]/g
+    const INVALID_OWNER_CHARS = /[^a-z0-9-]/gi
     const MULTIPLE_DASHES = /-{2,}/g
     const MATCHSTICK_ARMS = /^-|-$/
 
@@ -67,6 +68,10 @@ class Search extends React.Component {
       : owner
   }
 
+  handleBlur = () => {
+    this.setState({ focused: false })
+  }
+
   handleChange = ({ target: { value } }) => {
     this.setState(() => ({
       inputValue: this.sanitize(value),
@@ -81,7 +86,7 @@ class Search extends React.Component {
       (owner && repository && buildRepoPath({ owner, repository })) ||
       ''
 
-    this.setState({ editing: true, inputValue })
+    this.setState({ editing: true, focused: true, inputValue })
   }
 
   handleKeyDown = (e) => {
@@ -129,7 +134,7 @@ class Search extends React.Component {
 
   render () {
     const { isFetching, owner, progress, repository } = this.props
-    const { contentOverflowing, editing, inputValue } = this.state
+    const { contentOverflowing, editing, focused, inputValue } = this.state
 
     const value = editing || !owner || !repository
       ? inputValue
@@ -137,7 +142,10 @@ class Search extends React.Component {
 
     return (
       <form
-        className='search'
+        className={classnames('search', {
+          'search--busy': isFetching,
+          'search--focused': focused,
+        })}
         onSubmit={this.handleSubmit}
       >
         <input
@@ -146,6 +154,7 @@ class Search extends React.Component {
           autoCapitalize='off'
           className='search__input'
           disabled={isFetching}
+          onBlur={this.handleBlur}
           onFocus={this.handleFocus}
           onChange={this.handleChange}
           onKeyDown={this.handleKeyDown}
@@ -160,7 +169,7 @@ class Search extends React.Component {
         >
           {this.renderProxyChildren(value)}
         </div>
-        {isFetching && <div className='search__busy'/>}
+        <div className='search__spinner'/>
         {!isNaN(progress) && (
           <ProgressBar
             className='search__progress'

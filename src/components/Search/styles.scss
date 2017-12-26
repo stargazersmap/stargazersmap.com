@@ -5,6 +5,20 @@
 .search {
   position: relative;
   border-radius: $border-radius;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: inset 2px 3px 6px -2px rgba($color-black, 0.84);
+  transition: $transition-curve $transition-duration-fast box-shadow;
+  background-color: $color-dark-grey;
+  min-height: 2.25 * $base-font-size;
+
+  &--focused {
+    box-shadow:
+      inset 2px 5px 5px -2px rgba($color-black, 0.84),
+      0 0 8px rgba($color-straw, 0.64);
+  }
 
   &__input,
   &__input-proxy {
@@ -36,24 +50,21 @@
     }
   }
 
+  &--busy &__input {
+    width: calc(100% - 38px);
+  }
+
   &__input-proxy {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &--focused &__input-proxy {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    border-radius: $border-radius;
-    box-shadow: inset 2px 3px 6px -2px rgba($color-black, 0.84);
-    background-color: $color-dark-grey;
-    min-height: 2.25 * $base-font-size;
-    transition: $transition-curve $transition-duration-fast box-shadow;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  &__input:focus + &__input-proxy {
-    box-shadow:
-      inset 2px 5px 5px -2px rgba($color-black, 0.84),
-      0 0 8px rgba($color-straw, 0.64);
 
     &--overflowing {
       justify-content: flex-end;
@@ -64,13 +75,12 @@
     color: rgba($color-straw, 0.42);
   }
 
-  &__busy {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+  &__spinner {
+    display: none;
+    flex-shrink: 0;
+    margin-right: $step * 1.25;
     width: 28px;
     height: 28px;
-    display: block;
     border: 3px solid;
     border-color:
       rgba($color-straw, 0.42)
@@ -79,6 +89,10 @@
     border-radius: 50%;
     animation: rotate $spinner-animation-duration linear infinite;
     pointer-events: none;
+  }
+
+  &--busy &__spinner {
+    display: block;
   }
 
   &__progress {
