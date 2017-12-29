@@ -18,7 +18,7 @@ class UserControls extends React.PureComponent {
           'title--minimized': minimized,
         })}>
           <span className='title__emoji' role='img' aria-label='sparkles'>✨</span>
-          <span>Stargazers Map</span>
+          <span><a href="https://github.com/stargazersmap/stargazersmap.com">Stargazer's Map</a></span>
           {!minimized && (
             <span className='title__emoji' role='img' aria-label='sparkles'>✨</span>
           )}
